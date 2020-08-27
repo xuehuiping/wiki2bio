@@ -13,11 +13,11 @@ import numpy as np
 from PythonROUGE import PythonROUGE
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 from preprocess import *
-from util import * 
+from util import *
 
 
-tf.app.flags.DEFINE_integer("hidden_size", 500, "Size of each layer.")
-tf.app.flags.DEFINE_integer("emb_size", 400, "Size of embedding.")
+tf.app.flags.DEFINE_integer("hidden_size", 5, "Size of each layer.")
+tf.app.flags.DEFINE_integer("emb_size", 40, "Size of embedding.")
 tf.app.flags.DEFINE_integer("field_size", 50, "Size of embedding.")
 tf.app.flags.DEFINE_integer("pos_size", 5, "Size of embedding.")
 tf.app.flags.DEFINE_integer("batch_size", 32, "Batch size of train set.")
@@ -26,7 +26,7 @@ tf.app.flags.DEFINE_integer("source_vocab", 20003,'vocabulary size')
 tf.app.flags.DEFINE_integer("field_vocab", 1480,'vocabulary size')
 tf.app.flags.DEFINE_integer("position_vocab", 31,'vocabulary size')
 tf.app.flags.DEFINE_integer("target_vocab", 20003,'vocabulary size')
-tf.app.flags.DEFINE_integer("report", 5000,'report valid results after some steps')
+tf.app.flags.DEFINE_integer("report", 50,'report valid results after some steps')
 tf.app.flags.DEFINE_float("learning_rate", 0.0003,'learning rate')
 
 tf.app.flags.DEFINE_string("mode",'train','train or test')
@@ -91,21 +91,21 @@ def train(sess, dataloader, model):
             loss += model(x, sess)
             k += 1
             progress_bar(k%FLAGS.report, FLAGS.report)
-            if (k % FLAGS.report == 0):
+            if (k % 2 == 0):
                 cost_time = time.time() - start_time
                 write_log("%d : loss = %.3f, time = %.3f " % (k // FLAGS.report, loss, cost_time))
                 loss, start_time = 0.0, time.time()
-                if k // FLAGS.report >= 1: 
+                if k // FLAGS.report >= 1:
                     ksave_dir = save_model(model, save_dir, k // FLAGS.report)
                     write_log(evaluate(sess, dataloader, model, ksave_dir, 'valid'))
-                    
+
 
 
 def test(sess, dataloader, model):
     evaluate(sess, dataloader, model, save_dir, 'test')
 
 def save_model(model, save_dir, cnt):
-    new_dir = save_dir + 'loads' + '/' 
+    new_dir = save_dir + 'loads' + '/'
     if not os.path.exists(new_dir):
         os.mkdir(new_dir)
     nnew_dir = new_dir + str(cnt) + '/'
@@ -125,7 +125,7 @@ def evaluate(sess, dataloader, model, ksave_dir, mode='valid'):
         texts_path = "processed_data/test/test.box.val"
         gold_path = gold_path_test
         evalset = dataloader.test_set
-    
+
     # for copy words from the infoboxes
     texts = open(texts_path, 'r').read().strip().split('\n')
     texts = [list(t.strip().split()) for t in texts]
@@ -134,7 +134,7 @@ def evaluate(sess, dataloader, model, ksave_dir, mode='valid'):
     # with copy
     pred_list, pred_list_copy, gold_list = [], [], []
     pred_unk, pred_mask = [], []
-    
+
     k = 0
     for x in dataloader.batch_iter(evalset, FLAGS.batch_size, False):
         predictions, atts = model.generate(x, sess)
@@ -187,7 +187,7 @@ def evaluate(sess, dataloader, model, ksave_dir, mode='valid'):
     nocopy_result = "without copy F_measure: %s Recall: %s Precision: %s BLEU: %s\n" % \
     (str(F_measure), str(recall), str(precision), str(bleu))
     # print nocopy_result
-    result = copy_result + nocopy_result 
+    result = copy_result + nocopy_result
     # print result
     if mode == 'valid':
         print result

@@ -3,3 +3,4 @@ results/
 original_data.zip
 original_data/
 .idea/
+*.pyc
