@@ -35,8 +35,12 @@ check done
 1号机器准备数据，放入gpu机器运行
 ```
 xuehp@haomeiya001:~$ source ~/anaconda3/bin/activate 
-(base) xuehp@haomeiya001:/home/xuehp/git/wiki2bio$ conda create -name wiki2bio python=2.7 
+(base) xuehp@haomeiya001:/home/xuehp/git/wiki2bio$ conda create --name wiki2bio python=2.7 
+conda activate wiki2bio
 ```
 
 注意：
-这个使用的是`infobox-to-biography`，见作者的数据演示，不是表格生成文本。和我们实际上需要的不太完全一致。
+- 这个使用的是`infobox-to-biography`，见作者的数据演示，不是表格生成文本。和我们实际上需要的不太完全一致。
+- 1号机器环境准备好了。没开始训练。
+- https://wiki.yonyou.com/pages/viewpage.action?pageId=159379681
+
